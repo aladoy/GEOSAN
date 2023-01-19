@@ -1,10 +1,10 @@
-group_id,shortname,hex_color,hyperlink
-1,Couronnes périurbaines favorisées,#ebac23,
-2,Espaces ruraux peu attractifs,#00a76c,
-3,Zones urbaines et périurbaines d’expatriés,#00c6f8,
-4,Agglomérations et villes centres,#d163e6,
-5,Zones agricoles vieillissantes et conservatrices,#5954d6,
-6,Zones rurales et périurbaines familiales et pendulaires,#b80058,
-7,Zones périurbaines industrielles,#878500,
-8,Espaces défavorisés au plan socio-économique,#ff9287,
-9,Marges rurales de montagne aux populations fragiles,#b24502,
+group_id,shortname,hex_color,stats,full_descr
+1,Couronnes périurbaines favorisées,#ebac23,"(9.6 % de la population, 17.9 % des communes)","Ces communes résidentielles à faible densité sont en bordure des principales villes centres vaudoises. Les populations résidentes se démarquent par un contexte socio-économique favorable, des nationalités diverses, et une forte pendularité."
+2,Espaces ruraux peu attractifs,#00a76c,"(4.1 % de la population, 9.3 % des communes)","Ces espaces ruraux de basse et moyenne montagne sont éloignés des agglomérations. Il se distinguent par une faible attractivité, présentant un taux d’émigration plus faible que le reste du canton et une offre très restreinte d’industries, d’infrastructures publiques et de loisirs."
+3,Zones urbaines et périurbaines d’expatriés,#00c6f8,"(10.5 % de la population, 6.3 % des communes)","Ces espaces résidentiels urbains et périurbains se distinguent par une surreprésentation des populations allophones (ne parlant pas une langue nationale) et d’immigrés issus des pays européens. Les populations résidentes sont hautement qualifiées, à hauts revenus malgré de fortes inégalités."
+4,Agglomérations et villes centres,#d163e6,"(42.7 % de la population, 6.3 % des communes)","Ces espaces constituent les villes centres vaudoises et concentrent les activités économiques et les infrastructures publiques. Leur population est composée de jeunes et d’actifs, et les proportions de personnes immigrées (toutes régions confondues) et de personnes sans formation y sont les plus fortes du canton."
+5,Zones agricoles vieillissantes et conservatrices,#5954d6,"(2.6 % de la population, 18.2 % des communes)","Ces petites communes rurales ont une grande partie de leur territoire dédié à l’agriculture, et présentent les taux d’immigration les plus faibles du canton. Les populations résidentes sont âgées et relativement conservatrices."
+6,Zones rurales et périurbaines familiales et pendulaires,#b80058,"(7.2 % de la population, 23.5 % des communes)","Ces petites communes rurales et périurbaines de faible densité sont situées à l’intérieur des terres. La population résidente est familiale, avec une grande part d’enfants et d’actifs, et un niveau d’éducation légèrement supérieur au reste du canton. Il y a une forte pendularité vers les agglomérations voisines."
+7,Zones périurbaines industrielles,#878500,"(8.1 % de la population, 7.9 % des communes)",Ces espaces correspondent à des zones périurbaines de moyenne densité et principalement industrielles. Les populations résidentes sont principalement actives dans le secteur secondaire.
+8,Espaces défavorisés au plan socio-économique,#ff9287,"(12.7 % de la population, 6.3 % des communes)",Ces communes sont assez hétérogènes dans leur urbanisation mais leurs populations se distinguent par un niveau d’éducation et des revenus plus faibles que le reste du canton. Le taux d’immigration (toutes nationalités confondus) est légèrement supérieur à la moyenne.
+9,Marges rurales de montagne aux populations fragiles,#b24502,"(2.6 % de la population, 4.3 % des communes)","Ces territoires sont situés en région de montagne et éloignés des agglomérations. Les populations habitant dans ces espaces sont davantage défavorisés avec une surreprésentation des personnes âgées, ainsi qu’un niveau d’éducation et un revenu médian plus faibles que le reste du canton."
