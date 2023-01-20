@@ -12,6 +12,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">GEOSAN</a>
+      
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -27,10 +28,57 @@
         <!--<form class="d-flex">
           <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
+
         </form>-->
+        
+        <img src="https://www.epfl.ch/about/overview/wp-content/uploads/2020/07/logo-epfl-1024x576.png" alt="EPFL" height="50" style="text-align: center;">
       </div>
+      
     </div>
+    
   </nav>
+
+  <div class="container">
+    <strong>
+      <div class="row mt-4">
+        Description de la typologie des communes vaudoises
+      </div>
+    </strong>
+    <div class="row mt-4" style="text-align:justify">
+
+      Pour construire la typologie des 302 communes vaudoises, nous avons retenu 39 variables permettant de caractériser :<br>
+      - la population résidente au niveau démographique, migratoire, et socio-économique. <br>
+      - l’urbanisation de la commune à travers l’occupation du sol, l’altitude, et la proximité aux communes-centre. <br>
+      - le potentiel engagement de la commune, d’un point de vue financier et politique. <br>
+
+    </div>
+    <strong>
+      <div class="row mt-4">
+        Analyse en composantes principales (ACP)
+      </div>
+    </strong>
+    <div class="row mt-4" style="text-align:justify">
+      Cette étape permet de faciliter l’interprétation d’un jeu de données multivarié en réduisant son nombre de dimensions. Cela passe par la création d’un nombre réduit d’axes synthétiques (Composantes Principales CP) dont l’interprétation permet d’identifier les principaux facteurs d’opposition des territoires.
+      Nous avons conservé uniquement les quatre premières composantes principales (représentant 54.2 % de l’inertie totale) pour construire notre typologie, selon le test des bâtons brisés (broken stick model).
+    </div>
+    <div class="row mt-4" style="text-align:justify">
+      Le premier facteur (1ère CP – 23.3 % de l’inertie) illustre le caractère urbain / rural des communes et marque d’importantes différences socio-démographiques. Des espaces urbanisés (concentration des infrastructures publiques, parcs, industries et loisirs) en croissance démographique avec des inégalités économiques et une forte composante migratoire (allophones, part d’immigrés) sont en opposition avec des espaces ruraux (terres agricoles, pâturages et surfaces forestières, éloignement des agglomérations, altitude) conservateurs (score UDC), et des actifs occupés dans les secteurs primaires et secondaires.<br>
+      Le deuxième facteur d’opposition (2ème CP – 15 % de l’inertie) illustre des différences socio-économiques (revenu médian, part de la population diplômée, part de propriétaires versus part de la population sans formation post-obligatoire) et de mobilité quotidienne (part de pendulaires, enfants versus population vieillissante, vastes communes d’altitude).<br>
+      Le troisième facteur (3ème CP – 9.5 % de l’inertie) oppose des espaces périurbains industriels (concentration des infrastructures publiques, terres agricoles, surfaces dédiées à l’industrie, actifs dans secteurs secondaires) et à forte densité résidentielle avec des espaces de montagne isolés (vastes communes d’altitude, pâturages et surfaces forestières, éloignement des agglomérations), et vieillissants (retraités), à hauts revenus (taux d’imposition, part des diplômés) bien qu’inégaux.<br>
+      Le quatrième facteur (4ème CP – 6.4 % de l’inertie) illustre des oppositions de structure d’âge et de géographie en dissociant des espaces résidentiels où vit une population vieillissante (retraités) avec des espaces ruraux (part de propriétaires, loin des agglomérations, grande superficie, pâturages et surfaces forestières) où vit une population jeune (enfants et actifs).
+    </div>
+    <strong>
+      <div class="row mt-4">
+        Classification ascendante hiérarchique
+      </div>
+    </strong>
+    <div class="row mt-4" style="text-align:justify">
+      La classification ascendante hiérarchique est une approche de clustering qui a été utilisée pour grouper les communes vaudoises aux profils similaires.<br>
+      En se basant sur la position des communes dans les quatre dimensions identifiées par l’ACP, l’algorithme a créé des groupes de communes homogènes en minimisant les différences intra-groupes et en maximisant les différences inter-groupes. Le choix du nombre de groupes (ou classes) est un compromis entre la finesse des profils obtenus et la maximisation du coefficient de silhouette moyen (ressemblance intra-groupe). <br>
+      Neuf profils distincts de communes ont été retenus et sont décrits ci-dessous.
+    </div>
+
+  </div>
 
 <!-- END NAVBAR -->
     <div class="container">
@@ -45,18 +93,32 @@
     <form method="POST">
         {% csrf_token %}
         <div class="container">
-            {% for color in colors %}
+          {% for id, color, title, stats, description in typo_list %}
             <div class="row mt-4">
                 <div class="col-md-auto">
                     <button type="submit" name="category" value="{{ forloop.counter }}" class="btn btn-primary p-4 rounded-0" style="background-color:{{ color }};"></button>
                 </div>
-                <div class="col">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                <div class="col" style="text-align: justify;">
+                      Classe {{id}} : {{ title }}<br>
+                      {{ stats|safe }}<br>
+                      {{ description }}
+
                 </div>
             </div>
             {% endfor %}
         </div>
     </form>
+
+    <div><br></div>
+
+    <footer class="mt-auto">
+      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        © 2023 Copyright:
+        <a class="text-black" href="https://www.epfl.ch/labs/lasig/">LASIG EPFL</a>
+        |
+        <a class="text-black" href="https://www.giraph.org/">GIRAPH LAB</a>
+      </div>
+    </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   </body>

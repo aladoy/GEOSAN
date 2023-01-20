@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render
 import folium
 from branca.colormap import linear
 from branca.colormap import LinearColormap
+from branca.colormap import StepColormap
 import pandas as pd
 from .models import Communes
 import geopandas as gpd
@@ -58,27 +61,45 @@ def index(request):
     add_base_places(m,geojson_dir)
     #add_categorical_legend(m)
 
-    # select data type to display:
-    list_env = ["PM10","NOISE"]
-    list_demo = ["b21btot","RPNF"]
-    list_accessibility = ["D_PHARMA","MEDINCM"]
+    # Polutate 
+    indicators = pd.read_csv('./legend/ha_indicators_legend.csv', encoding='utf-8')
+    list_env_disp = []
+    list_demo_disp = []
+    list_accessibility_disp = []
 
+    list_env = ["NO2","PM10","PM25","NOISE","LST"]
+    #for elem in list_env:
+    #    list_env_disp.append(indicators[indicators['var'] == elem]['var_descr'].iloc[0])
+    
+    list_demo = ["b21btot","RPNF"]
+    #for elem in list_demo:
+    #    list_demo_disp.append(indicators[indicators['var'] == elem]['var_descr'].iloc[0])
+
+    list_accessibility = ["D_PHARMA","MEDINCM"]
+    
     if request.method=="POST":
 
         commune_request_name = request.POST["commune_name"]
+        #var_name_disp = request.POST.get('var_name')
+        #var_name = get_var_from_post(var_name_disp)
+
         var_name = request.POST["var_name"]
 
-        gdf = gpd.read_file("./geojson/var_hectares_wgs.geojson")
+        # checker dans quel liste de variables se situe la variable
+        if var_name in list_env:
+            gdf = gpd.read_file("./geojson/environmental_exposures_4326.geojson")
+        else:
+            gdf = gpd.read_file("./geojson/var_hectares_wgs.geojson")
 
-        map_dict = gdf.set_index('reli')[var_name].to_dict()
+        map_dict = gdf.set_index('RELI')[var_name].to_dict()
 
-        gdf_kept = gdf[gdf['name']==commune_request_name]
+        gdf_kept = gdf[gdf['MUN_NAME']==commune_request_name]
 
         mean_commune = gdf_kept[var_name].mean()
 
-        gdf_to_dissolve = gdf_kept[['name','geometry']]
+        gdf_to_dissolve = gdf_kept[['MUN_NAME','geometry']]
         gdf_to_dissolve = gdf_to_dissolve.to_crs('2056')
-        gdf_to_dissolve = gdf_to_dissolve.dissolve(by='name').centroid
+        gdf_to_dissolve = gdf_to_dissolve.dissolve(by='MUN_NAME').centroid
 
         m.location = [gdf_to_dissolve[0].y, gdf_to_dissolve[0].x]
 
@@ -86,7 +107,7 @@ def index(request):
         
         if var_name in list_env:
 
-            [x_list, x_text, href, limitations_informations, unit] = select_var_limites(var_name, gdf)
+            [x_list, x_text, limitations_informations, unit, href] = select_var_limites(var_name, gdf)
             
             x_vect = [x_list[0]+(x_list[1]-x_list[0])/2, 
                         x_list[1]+(x_list[2]-x_list[1])/2, 
@@ -103,12 +124,12 @@ def index(request):
             data_tuples = list(zip(x_vect,width_vect,color_vect))
             df_test = pd.DataFrame(data_tuples, columns=['x','width','color'])
 
-            [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, href, unit, commune_request_name)
+            [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, unit, commune_request_name, href)
 
             folium.GeoJson(gdf_kept, 
                 name='geojson',
                 zoom_on_click=False,
-                tooltip=folium.GeoJsonTooltip(fields=['name', var_name]),
+                tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', var_name, 'PTOT'],aliases=['Nom de la commune', 'Valeur',"Population totale de l'hectare"]),
                 style_function= lambda feature:{
                 'fillColor': get_color_discrete(feature,var_name,x_list[1], x_list[2], x_list[3], x_list[4]),
                 'fillOpacity': 1,
@@ -130,10 +151,10 @@ def index(request):
                     name_of_commune = gdf_communes.iloc[index].Nom_CMN
                     communes_kept_indexes.append(index)
                     if name_of_commune != commune_request_name:
-                        folium.GeoJson(gdf[gdf['name']==name_of_commune], 
+                        folium.GeoJson(gdf[gdf['MUN_NAME']==name_of_commune], 
                             name='geojson',
                             zoom_on_click=False,
-                            tooltip=folium.GeoJsonTooltip(fields=['name', var_name]),
+                            tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', var_name, 'PTOT'], aliases=['Nom de la commune', 'Valeur', "Population totale de l'hectare"]),
                             style_function= lambda feature:{
                             'fillColor': get_color_discrete(feature,var_name,x_list[1], x_list[2], x_list[3], x_list[4]),
                             'fillOpacity': 1,
@@ -144,92 +165,11 @@ def index(request):
             hec_group.add_to(m)
             m.keep_in_front(hec_group)
 
-        '''elif var_name in list_accessibility:
-            
-            gdf_communes = gpd.read_file('./shapefiles/Communes_WGS.shp')
-            gdf_communes = gdf_communes.to_crs('2056')
-            commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN']==commune_request_name].geometry.buffer(1000)
-            gdf_communes_geom = gdf_communes.geometry
-
-            result_touches = gdf_communes_geom.intersects(commune_a_intersecter_geom.iloc[0])
-            
-            communes_kept_indexes = []
-            communes_kept_names = []
-            for index, elem in enumerate(result_touches):
-                if elem == True:
-                    name_of_commune = gdf_communes.iloc[index].Nom_CMN
-                    communes_kept_indexes.append(index)
-                    communes_kept_names.append(name_of_commune)
-
-            gdf_kept_buffer = gdf[gdf['name'].isin(communes_kept_names)]
-            var_values = gdf_kept_buffer[var_name]
-            max_communes = np.nanmax(var_values)
-            min_communes = np.nanmin(var_values)
-
-            range_values = max_communes-min_communes
-
-            folium.GeoJson(gdf_kept, 
-                name='geojson',
-                zoom_on_click=True,
-                tooltip=folium.GeoJsonTooltip(fields=['name', var_name]),
-                style_function= lambda feature:{
-                'fillColor': get_color_discrete_access(feature,var_name,min_communes,range_values),
-                'fillOpacity': 1,
-                'weight':0.1,
-                },
-                highlight_function=highlight_function).add_to(hec_group)
-
-            m.fit_bounds(hec_group.get_bounds())
-
-            for index, elem in enumerate(result_touches):
-                if elem == True:
-                    name_of_commune = gdf_communes.iloc[index].Nom_CMN
-                    if name_of_commune != commune_request_name:
-                        folium.GeoJson(gdf[gdf['name']==name_of_commune], 
-                            name='geojson',
-                            zoom_on_click=True,
-                            tooltip=folium.GeoJsonTooltip(fields=['name', var_name]),
-                            style_function= lambda feature:{
-                            'fillColor': get_color_discrete_access(feature, var_name, min_communes, range_values),
-                            'fillOpacity': 1,
-                            'weight':0.1,
-                            },
-                            highlight_function=highlight_function).add_to(hec_group)
-
-            hec_group.add_to(m)
-
-            x_vect = [min_communes+range_values/10, min_communes+3*range_values/10, min_communes+5*range_values/10, min_communes+7*range_values/10, min_communes+9*range_values/10]
-            width_vect = [range_values/5, range_values/5, range_values/5, range_values/5, range_values/5]
-            color_vect = []
-
-            for elem in x_vect:
-                color_vect.append(get_color_access(elem,min_communes,range_values))
-
-            data_tuples = list(zip(x_vect,width_vect,color_vect))
-
-            df_test = pd.DataFrame(data_tuples, columns=['x','width','color'])
-
-            fig = go.Figure(data=[go.Bar(
-                x=df_test['x'],
-                y=[1, 1, 1, 1, 1],
-                marker={'color': df_test['color']},
-                width=df_test['width']
-            )])
-
-            fig.update_yaxes(visible=False)
-
-            config = {'staticPlot': True}
-
-            set_layout(fig, min_communes, max_communes, 70, unit)
-
-            fig.add_vline(x=mean_commune, line_width=2, line_color="blue")
-            fig.add_annotation(x=mean_commune, y=0.5 , text="Moyenne communale", font=dict(size=12),showarrow=False,)
-
-            legend_color_scale = fig.to_html(config=config)'''
-
         current_commune_text = commune_request_name+" - "+var_name + " " + unit
 
-    folium.LayerControl().add_to(m)
+    control = folium.LayerControl()
+    control.add_child(folium.IFrame(html='<a href="https://www.example.com">Visiter le site web</a>', width=200, height=100))
+    control.add_to(m)
     m = m._repr_html_()
     context = {
 
@@ -269,25 +209,44 @@ def typologie(request):
     'dashArray' : '3, 6' # transforms the solid stroke to a dashed stroke
     }
 
+
     geojson_dir = geojson_dir = os.path.join(os.getcwd(),'geojson')
-    colormap = linear.Set2_06.scale(1,9)
+
+    typology_legend = pd.read_csv('./legend/typology_legend.csv', encoding='utf-8')
+    #colormap_old = linear.Set2_06.scale(1,9)
+    colors = typology_legend["hex_color"]
+    colormap = StepColormap(
+        colors,
+        index=range(len(colors)),
+        vmin=1,
+        vmax=len(colors),
+        caption='Color Map'
+    )
 
     typo_group = folium.FeatureGroup(name='Typologie')
-    folium.GeoJson(os.path.join(geojson_dir,'Communes_WGS.geojson'), 
+    folium.GeoJson(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'), 
         name='geojson',
         zoom_on_click=True,
         overlay=False,
-        tooltip=folium.GeoJsonTooltip(fields=['Nom_CMN', 'clust_ward'], aliases=['Nom de la commune','Classe de typologie']),
+        tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID','shortname', 'PTOT'], aliases=['Nom de la commune','Classe de typologie','Typologie description','Population totale']),
         style_function= lambda feature:{
-        'fillColor': colormap(feature['properties']['clust_ward']),
-        'fillOpacity': 0.8,
+        'fillColor': colormap(feature['properties']['GROUP_ID']),
+        'fillOpacity': 0.6,
         'weight':1,
+        'color':'white'
         },
         highlight_function=highlight_function).add_to(typo_group)
     typo_group.add_to(m)
     m.keep_in_front(typo_group)
 
-    colors = ['#76d886','#a9975e','#e97c7c','#a9aac9','#c293d5','#e5b2e2','#a2e587','#d1f854','#e9e320']
+    
+    class_id = typology_legend["group_id"]
+    
+    typo_title = typology_legend["shortname"]
+    stats = typology_legend["stats"]
+    description = typology_legend["full_descr"]
+    
+    typo_list = zip(class_id,colors,typo_title, stats, description)
 
     if request.method=="POST":
 
@@ -301,56 +260,66 @@ def typologie(request):
         folium.TileLayer('cartodbpositron', control=False).add_to(m)
 
         category_numero = int(request.POST['category'])
-        gdf = gpd.read_file(os.path.join(geojson_dir,'Communes_WGS.geojson'))
-        gdf_sorted = gdf[gdf['clust_ward'] == category_numero]
+        gdf = gpd.read_file(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'))
+        gdf_sorted = gdf[gdf['GROUP_ID'] == category_numero]
         folium.GeoJson(gdf_sorted, 
             name='geojson',
             zoom_on_click=True,
             overlay=False,
-            tooltip=folium.GeoJsonTooltip(fields=['Nom_CMN', 'clust_ward'], aliases=['Nom de la commune','Classe de typologie']),
+            tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID'], aliases=['Nom de la commune','Classe de typologie']),
             style_function= lambda feature:{
             'fillColor': colormap(category_numero),
-            'fillOpacity': 0.8,
+            'fillOpacity': 0.6,
             'weight':1,
+            'color':'white'
             },
             highlight_function=highlight_function).add_to(m)
 
     m = m._repr_html_()
     context={
         'm':m,
-        'colors':colors,
+        'typo_list':typo_list
     }
 
     return render(request, 'typologie.html', context)
 
 def add_base_layers(m, highlight_function, geojson_dir):
 
-    colormap = linear.Set2_06.scale(1,9)
-
+    typology_legend = pd.read_csv('./legend/typology_legend.csv', encoding='utf-8')
+    colors = typology_legend["hex_color"]
+    colormap = StepColormap(
+        colors,
+        index=range(len(colors)),
+        vmin=1,
+        vmax=len(colors),
+        caption='Color Map'
+    )
     ################ COMMUNES ##############################################################
     communes_group = folium.FeatureGroup(name='Communes',control=False)
-    folium.GeoJson(os.path.join(geojson_dir,'Communes_WGS.geojson'), 
+    folium.GeoJson(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'), 
         name='geojson',
         zoom_on_click=True,
-        tooltip=folium.GeoJsonTooltip(fields=['Nom_CMN'], aliases=['Nom de la commune']),
+        tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'PTOT'], aliases=['Nom de la commune', 'Population totale']),
         style_function= lambda feature:{
         'fillOpacity': 0,
         'weight':1,
+        'color':'black'
         },
         highlight_function=highlight_function).add_to(communes_group)
     communes_group.add_to(m)
 
     ################ Typologie ##############################################################
     typo_group = folium.FeatureGroup(name='Typologie')
-    folium.GeoJson(os.path.join(geojson_dir,'Communes_WGS.geojson'), 
+    folium.GeoJson(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'), 
         name='geojson',
         zoom_on_click=True,
         overlay=False,
-        tooltip=folium.GeoJsonTooltip(fields=['Nom_CMN', 'clust_ward'], aliases=['Nom de la commune','Classe de typologie']),
+        tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID', 'shortname', 'PTOT'], aliases=['Nom de la commune','Classe de typologie', 'Description de la typologie', 'Popultation totale']),
         style_function= lambda feature:{
-        'fillColor': colormap(feature['properties']['clust_ward']),
-        'fillOpacity': 0.8,
+        'fillColor': colormap(feature['properties']['GROUP_ID']),
+        'fillOpacity': 0.6,
         'weight':1,
+        'color':'white'
         },
         highlight_function=highlight_function).add_to(typo_group)
     typo_group.add_to(m)
@@ -430,7 +399,7 @@ def set_x_values(x_min, x_1, x_2, x_3, x_4, x_max):
     x_list = [x_min, x_1, x_2, x_3, x_4, x_max]
     return x_list
 
-def add_informations(df_test, x_list, mean_commune, gdf_kept, var_name, map_dict, x_text, href, unit, commune_name):
+def add_informations(df_test, x_list, mean_commune, gdf_kept, var_name, map_dict, x_text, unit, commune_name, href):
 
     ################### Legend Text ############################################################
     

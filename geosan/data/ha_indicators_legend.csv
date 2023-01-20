@@ -1,0 +1,44 @@
+row,var,var_label,var_descr,unit,x1_value,x2_value,x3_value,x4_value,x1_label,x2_label,x3_label,x4_label,x1_hyperlink,x2_hyperlink,x3_hyperlink,x4_hyperlink
+0,ER_TIME,ACCESSIBILITÉ URGENCES,Temps d'accès à un établissement d'urgence,[mn],5,10,15,20,5mn,10mn,15mn,20mn,,,,
+1,DENTAL_TIME,ACCESSIBILITÉ PERM. DENTAIRE,Temps d'accès à une permanece dentaire,[mn],5,10,15,20,5mn,10mn,15mn,20mn,,,,
+2,PHARMA_TIME,ACCESSIBILITÉ PHARMACIES,Temps d'accès à une pharmacie,[mn],5,10,15,20,5mn,10mn,15mn,20mn,,,,
+3,AMBU_TIME,ACCESSIBILITÉ AMBULANCE,Temps d'accès à une ambulance,[mn],5,10,15,20,5mn,10mn,15mn,20mn,,,,
+4,PLAYGRD_TIME,ACCESSIBILITÉ AIRES JEUX,Temps d'accès à une aire de jeux pour enfants,[mn],5,10,15,20,5mn,10mn,15mn,20mn,,,,
+5,D_MEDIC,ACCESSIBILITÉ CABINETS MÉDICAUX,Distance via réseau routier au cabinet médical / centre ambulatoire le plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+6,D_GROCERY,ACCESSIBILITÉ ALIMENTATION,Distance via réseau routier au magasin d'alimentation le plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+7,D_SCHOOL_O,ACCESSIBILITÉ FORMATION (SCOLARITÉ OBLIGATOIRE),Distance via réseau routier à l'institution de formation (scolarité obligatoire) la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+8,D_SCHOOL_S,ACCESSIBILITÉ FORMATION (DEGRÉ SECONDAIRE II),Distance via réseau routier à l'institution de formation (degré secondaire II) la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+9,D_EDUC,ACCESSIBILITÉ FORMATION (DEGRÉ TERTIAIRE),Distance via réseau routier à l'institution de formation (degré tertiaire) la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+10,D_FOREST,ACCESSIBILITÉ FORÊTS,Distance via réseau routier à la lisière de forêt la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+11,D_LAKE,ACCESSIBILITÉ LACS,Distance via réseau routier à la rive de lac la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+12,D_SPORT,ACCESSIBILITÉ SPORT,Distance via réseau routier à l'installation sportive / fitness la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+13,D_SWIM,ACCESSIBILITÉ NATATION,Distance via réseau routier à la piscine ou plage la plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+14,D_SECURITY,ACCESSIBILITÉ SÉCURITÉ,Distance via réseau routier au service d'ordre public / de sécurité le plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+15,D_STOP_TOT,ACCESSIBILITÉ TRANSPORTS PUBLICS,Distance via réseau routier à l'arrêt de transport public le plus proche,[km],1,5,10,20,1km,5km,10km,20km,,,,
+16,N_ACC_PED,ACCIDENTS PIÉTONS,Accidents de la route incluant un piéton dans un rayon de 2km,[nb/10 ans],3,10,50,100,< 3,10-Mar,Oct-50,> 100,"<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>"
+17,N_ACC_BIC,ACCIDENTS VÉLOS,Accidents de la route incluant un vélo dans un rayon de 2km,[nb/10 ans],3,10,50,100,< 3,10-Mar,Oct-50,> 100,"<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>","<a href=""https://www.bfs.admin.ch/bfs/fr/home/statistiques/mobilite-transports/accidents-impact-environnement/accidents-transports/route.html""><b>"
+18,NO2,NO2,Dioxyde d'azote (NO2),[µg/m3],10.522,13.248,20,30,25% VD,Med VD,WHO,Opair,,,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/oxydes-d-azote.html""><b>"
+19,PM10,PM10,Poussières fines (PM10),[µg/m3],10.784,12.008,15,20,25% VD,Med VD,WHO,Opair,,,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/poussieres-fines.html""><b>"
+20,PM25,PM2.5,Poussières fines (PM2.5),[µg/m3],5,8,8.612,10,WHO,25% VD,Med VD,Opair,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>",,,"<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/poussieres-fines.html""><b>"
+21,NOISE,BRUIT,Bruit nocturne (routier et ferroviaire),[dB(A)],30,40,55,65,Slice effect,Effect,Dangerous situation,LPE,"<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/bruit/info-specialistes/exposition-au-bruit/valeurs-limites-pour-le-bruit/valeurs-limites-dexposition-au-bruit.html""><b>"
+22,LST,LST,Température de surface,[°C],25,30,35,40,25°C,30°C,35°C,40°C,"<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>"
+23,RP0014,POPULATION <14 ANS,Part de la population <14 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+24,RP1524,POPULATION 15-24 ANS,Part de la population 15-24 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+25,RP2564,POPULATION 25-64 ANS,Part de la population 25-64 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+26,RP65M,POPULATION >65 ANS,Part de la population >65 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+27,RP80M,POPULATION >80 ANS,Part de la population >80 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+28,RP0014_M,HOMMES <14 ANS,Part des hommes <14 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+29,RP1524_M,HOMMES 15-24 ANS,Part des hommes 15-24 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+30,RP2564_M,HOMMES 25-64 ANS,Part des hommes 25-64 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+31,RP65M_M,HOMMES >65 ANS,Part des hommes >65 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+32,RP80M_M,HOMMES >80 ANS,Part des hommes >80 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+33,RP0014_F,FEMMES <14 ANS,Part des femmes <14 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+34,RP1524_F,FEMMES 15-24 ANS,Part des femmes 15-24 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+35,RP2564_F,FEMMES 25-64 ANS,Part des femmes 25-64 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+36,RP65M_F,FEMMES >65 ANS,Part des femmes >65 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+37,RP80M_F,FEMMES >80 ANS,Part des femmes >80 ans,[%],20,40,60,80,20%,40%,60%,80%,,,,
+38,R_FFB,IMMIGRATION,Population étrangère (non naturalisée),[%],20,40,60,80,20%,40%,60%,80%,,,,
+39,R_NN_FRA,NON FRANCOPHONES,Population non francophone,[%],20,40,60,80,20%,40%,60%,80%,,,,
+40,R_NN_POBL,SANS FORMATION POSTOBL.,Population sans formation postobligatoire,[%],20,40,60,80,20%,40%,60%,80%,,,,
+41,R_DIS,HANDICAPÉS,Personnes handicapées,[%],20,40,60,80,20%,40%,60%,80%,,,,
+42,R_UNEMP,CHÔMAGE,Population sans emploi,[%],20,40,60,80,20%,40%,60%,80%,,,,
