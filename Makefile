@@ -5,7 +5,7 @@ generate-selfsigned-cert:
 	cd cert && OWNER="${UID}.${GID}" docker-compose up --remove-orphans
 
 setup: 
-	poetry install -vvv
+	poetry install
 
 dev: # local
 	cd geosan; poetry run gunicorn webmapping.wsgi
