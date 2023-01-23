@@ -15,4 +15,6 @@ COPY geosan /app/geosan
 
 WORKDIR /app/geosan
 
-CMD ["poetry", "run", "gunicorn", "webmapping.wsgi"]
+EXPOSE 8000
+
+CMD ["poetry", "run", "gunicorn", "--bind", "0.0.0.0:8000", "webmapping.wsgi"]
