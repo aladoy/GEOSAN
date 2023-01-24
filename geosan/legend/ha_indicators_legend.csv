@@ -1,6 +1,6 @@
 row,var,var_label,var_descr,unit,x1_value,x2_value,x3_value,x4_value,x1_label,x2_label,x3_label,x4_label,x1_hyperlink,x2_hyperlink,x3_hyperlink,x4_hyperlink
 0,ER_TIME,ACCESSIBILITÉ URGENCES,Temps d'accès à un établissement d'urgence,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
-1,DENTAL_TIME,ACCESSIBILITÉ PERM. DENTAIRE,Temps d'accès à une permanece dentaire,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
+1,DENTAL_TIME,ACCESSIBILITÉ PERM. DENTAIRE,Temps d'accès à une permanence dentaire,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
 2,PHARMA_TIME,ACCESSIBILITÉ PHARMACIES,Temps d'accès à une pharmacie,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
 3,AMBU_TIME,ACCESSIBILITÉ AMBULANCE,Temps d'accès à une ambulance,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
 4,PLAYGRD_TIME,ACCESSIBILITÉ AIRES JEUX,Temps d'accès à une aire de jeux pour enfants,[mn],5.0,10.0,15.0,20.0,5mn,10mn,15mn,20mn, , , , 
@@ -22,7 +22,7 @@ row,var,var_label,var_descr,unit,x1_value,x2_value,x3_value,x4_value,x1_label,x2
 20,NO2,NO2,Dioxyde d'azote (NO2),[µg/m3],10.0,10.521999999999998,13.248,30.0,WHO,25% VD,Med VD,Opair,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>", , ,"<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/oxydes-d-azote.html""><b>"
 21,PM10,PM10,Poussières fines (PM10),[µg/m3],10.784,12.008,15.0,20.0,25% VD,Med VD,WHO,Opair, , ,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/poussieres-fines.html""><b>"
 22,PM25,PM2.5,Poussières fines (PM2.5),[µg/m3],5.0,8.0,8.612,10.0,WHO,25% VD,Med VD,Opair,"<a href=""https://www.who.int/publications/i/item/9789240034228""><b>", , ,"<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/produits-chimiques/glossaire-des-polluants/poussieres-fines.html""><b>"
-23,NOISE,BRUIT,Bruit nocturne (routier et ferroviaire),[dB(A)],30.0,40.0,55.0,65.0,Slice effect,Effect,Dangerous situation,LPE,"<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/bruit/info-specialistes/exposition-au-bruit/valeurs-limites-pour-le-bruit/valeurs-limites-dexposition-au-bruit.html""><b>"
+23,NOISE,BRUIT,Bruit nocturne (routier et ferroviaire),[dB(A)],30.0,40.0,55.0,65.0,Effet modeste,Effet néfaste,Situation dangereuse,Non réglementaire (>LPE),"<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://apps.who.int/iris/handle/10665/326486""><b>","<a href=""https://www.bafu.admin.ch/bafu/fr/home/themes/bruit/info-specialistes/exposition-au-bruit/valeurs-limites-pour-le-bruit/valeurs-limites-dexposition-au-bruit.html""><b>"
 24,LST,LST,Température de surface,[°C],25.0,30.0,35.0,40.0,25°C,30°C,35°C,40°C,"<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>","<a href=""https://www.meteosuisse.admin.ch/climat/climat-de-la-suisse/chaleur-en-milieu-urbain.html""><b>"
 25,RP0014,POPULATION <14 ANS,Part de la population <14 ans,[%],20.0,40.0,60.0,80.0,20%,40%,60%,80%, , , , 
 26,RP1524,POPULATION 15-24 ANS,Part de la population 15-24 ans,[%],20.0,40.0,60.0,80.0,20%,40%,60%,80%, , , , 
@@ -48,3 +48,6 @@ row,var,var_label,var_descr,unit,x1_value,x2_value,x3_value,x4_value,x1_label,x2
 46,R_NN_POBL,SANS FORMATION POSTOBL.,Population sans formation postobligatoire,[%],20.0,40.0,60.0,80.0,20%,40%,60%,80%, , , , 
 47,R_DIS,HANDICAPÉS,Personnes handicapées,[%],20.0,40.0,60.0,80.0,20%,40%,60%,80%, , , , 
 48,R_UNEMP,CHÔMAGE,Population sans emploi,[%],20.0,40.0,60.0,80.0,20%,40%,60%,80%, , , , 
+49,ENV_INDEX,INDICE ENVIRONNEMENTAL,Indice composite représentant l'exposition aux nuisances et pollutions environnementales,[-],0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8, , , , 
+50,HEALTHCARE_INDEX,INDICE ACCESSIBILITÉ SOINS,INDICE COMPOSITE REPRÉSENTANT L'ÉLOIGNEMENT AUX SERVICES DE SANTÉ,[-],0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8, , , , 
+51,SOC_ECO_INDEX,INDICE SOCIAL ET ECONOMIQUE,INDICE COMPOSITE REPRÉSENTANT LA VULNÉRABILITÉ SOCIALE ET ÉCONOMIQUE DE LA POPULATION,[-],0.2,0.4,0.6,0.8,0.2,0.4,0.6,0.8, , , , 
