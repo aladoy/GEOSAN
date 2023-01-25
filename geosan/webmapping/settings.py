@@ -123,7 +123,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = ["https://localhost"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost", "https://geosan.epfl.ch"]
 
 CSRF_COOKIE_SECURE = False
 
