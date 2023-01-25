@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-wjrupyo)^3_bk4c3b!ayo^)4p4k1=hgapb#gdk(2iu5cjdiu0q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "geosan.epfl.ch"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "geosan.epfl.ch"]
 
 
 # Application definition

@@ -41,6 +41,7 @@ def index(request):
     legend_color_scale=""
     legend_text=""
     commune_request_name=""
+    commune_name_descr = ""
     current_commune_text=""
     var_name=""
     var_name_descr=""
@@ -106,7 +107,9 @@ def index(request):
         name_var = match.group(2)
 
         #gdf_municipalities = gpd.read_file('./geojson/typology_municipalities_4326.geojson')
-        commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'] == commune_request_name]['MUN_OFS_ID'].iloc[0]
+        #commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'] == commune_request_name]['MUN_OFS_ID'].iloc[0]
+        commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'].str.contains(commune_request_name)]['MUN_OFS_ID'].iloc[0]
+        commune_name_descr = gdf_municipalities[gdf_municipalities['MUN_NAME'].str.contains(commune_request_name)]['MUN_NAME'].iloc[0]
 
         if any(name_var in x for x in list_env_descr):
             var_name = list_env[index_var]
@@ -156,7 +159,7 @@ def index(request):
         data_tuples = list(zip(x_vect,width_vect,color_vect))
         df_test = pd.DataFrame(data_tuples, columns=['x','width','color'])
 
-        [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, unit, commune_request_name, href, var_name_descr)
+        [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, unit, commune_name_descr, href, var_name_descr)
 
         folium.GeoJson(gdf_kept, 
             name='geojson',
@@ -174,7 +177,8 @@ def index(request):
 
         gdf_communes = gpd.read_file('./shapefiles/Caracterisation_PCA.shp')
 
-        commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN']==commune_request_name].geometry.buffer(1000)
+        #commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN']==commune_request_name].geometry.buffer(1000)
+        commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN'].str.contains(commune_request_name)].geometry.buffer(1000)
         #commune_a_intersecter_geom = gdf_municipalities[gdf_municipalities['MUN_NAME']==commune_request_name].geometry.buffer(1000).to_crs('2056')
         
         gdf_communes_geom = gdf_communes.geometry
@@ -204,7 +208,8 @@ def index(request):
         hec_group.add_to(m)
         m.keep_in_front(hec_group)
         
-        current_commune_text = commune_request_name+" - "+var_name_descr + " " + unit
+        #current_commune_text = commune_request_name+" - "+var_name_descr + " " + unit
+        current_commune_text = commune_name_descr+" - "+var_name_descr + " " + unit
 
     
     control.add_child(folium.IFrame(html='<a href="https://www.example.com">Visiter le site web</a>', width=200, height=100))
@@ -223,7 +228,7 @@ def index(request):
         'legend_color_scale':legend_color_scale,
         'legend_text':legend_text,
         'legend_moyenne_text':legend_moyenne_text,
-        'current_commune_name':commune_request_name,
+        'current_commune_name':commune_name_descr,
         'limitations_informations':limitations_informations,
         'current_commune_text' : current_commune_text,
         'var_name':var_name,
