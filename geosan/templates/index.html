@@ -63,28 +63,37 @@
           <div class="col mt-3">
             <div>Quel indicateur voulez-vous afficher ?</div>
             <select name="var_name" class="form-select">
-              <optgroup label="Environnement">
-                {% for var in list_env %}
+              <optgroup name='env' label="Expositions environnementales">
+                {% for i, var in list_env %}
 
-                <option value={{ var }}  {% if var_name == var %} selected="selected" {% endif%}>
+                <option value={{ i }}{{ var }}  {% if var_name_descr == var %} selected="selected" {% endif%}>
                   {{ var }}
                 </option>
 
                 {% endfor %}
               </optgroup>
-              <optgroup label="Demographie">
-                {% for var in list_demo %}
+              <optgroup name="accessibility" label="Accessibilité">
+                {% for i, var in list_accessibility %}
 
-                <option value={{ var }}  {% if var_name == var %} selected="selected" {% endif%}>
+                <option value={{ i }}{{ var }}  {% if var_name_descr == var %} selected="selected" {% endif%}>
                   {{ var }}
                 </option>
 
                 {% endfor %}
               </optgroup>
-              <optgroup label="Accessibilite">
-                {% for var in list_accessibility %}
+              <optgroup name='demo'label="Démographie">
+                {% for i, var in list_demo %}
 
-                <option value={{ var }}  {% if var_name == var %} selected="selected" {% endif%}>
+                <option value={{ i }}{{ var }}  {% if var_name_descr == var %} selected="selected" {% endif%}>
+                  {{ var }}
+                </option>
+
+                {% endfor %}
+              </optgroup>
+              <optgroup name="socio_eco" label="Socio-économique">
+                {% for i, var in list_socio_eco %}
+
+                <option value={{ i }}{{ var }}  {% if var_name_descr == var %} selected="selected" {% endif%}>
                   {{ var }}
                 </option>
 
@@ -95,9 +104,6 @@
         </div>
         <div class="row">
 
-          <!--<div class="col mt-3">
-            <button class="btn btn-outline-success" type="submit">Rechercher</button>
-          </div>-->
           <div class="col mt-3">
             <button class="btn btn-outline-success" type="submit">Rechercher</button>
           </div>
@@ -146,6 +152,7 @@
     
     <div class="container">
       {{hist|safe}}
+      <br>
     </div>
 
     <footer class="mt-auto">
@@ -160,3 +167,4 @@
   </body>
 
 </html>
+
