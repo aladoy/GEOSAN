@@ -478,8 +478,12 @@ def add_informations(df_test, x_list, mean_commune, gdf_kept, var_name, map_dict
 
     ############ Legend ##############################################
     invert_color_list = ["GREEN_SP","BLUE_SP","MEDREV"]
+    jaune_rouge_list = ["RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M","R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
     if var_name in invert_color_list:
         df_test["color"] = np.flip(df_test["color"].values)
+
+    if var_name in jaune_rouge_list:
+        df_test.loc[:, "color"] = ["#FFFFE0","#FFFF00","#FFCC00","#FF9933","#FF0000"]
 
     fig = go.Figure(data=[go.Bar(
                     x=df_test['x'],
@@ -601,6 +605,7 @@ def get_color_discrete_access(feature, var_name, min, range):
 def get_color_discrete(feature, var_name ,x1, x2, x3, x4 ):
     value = feature['properties'][var_name]
     invert_color_list = ["GREEN_SP","BLUE_SP","MEDREV"]
+    jaune_rouge_list = ["RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M","R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
     if value is None:
         return '#8c8c8c'
     if var_name in invert_color_list:
@@ -614,6 +619,17 @@ def get_color_discrete(feature, var_name ,x1, x2, x3, x4 ):
             return '#cdff32'
         else:
             return '#32ff6a'
+    elif var_name in jaune_rouge_list:
+        if value <= x1:
+            return '#FFFFE0' 
+        elif value <= x2:
+            return '#FFFF00'
+        elif value <= x3:
+            return '#FFCC00'
+        elif value <= x4:
+            return '#FF9933'
+        else:
+            return '#FF0000'
     else:
         if value <= x1:
             return '#32ff6a'
