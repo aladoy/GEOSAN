@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect, HttpResponseRedirect
 import folium
 from branca.colormap import linear
 from branca.colormap import LinearColormap
@@ -20,11 +20,14 @@ from map.utils import *
 from map.utils_var import *
 import json
 import re
+import time
+from shapely.geometry import shape
 
 # Create your views here.
 
 def index(request):
 
+    t_init=time.time()
     m = folium.Map(location = [46.61280022381356, 6.61517533257687],
         tiles=None,
         #tiles='OpenStreetMap',
@@ -41,7 +44,6 @@ def index(request):
     legend_color_scale=""
     legend_text=""
     commune_request_name=""
-    commune_name_descr = ""
     current_commune_text=""
     var_name=""
     var_name_descr=""
@@ -49,7 +51,8 @@ def index(request):
     unit = ""
     legend_moyenne_text = ""
 
-    gdf_municipalities = gpd.read_file('./geojson/typology_municipalities_4326.geojson')
+    gdf_municipalities = gpd.read_file('./geojson/typology_municipalities_4326_simplified.geojson')
+
     communes_names = gdf_municipalities['MUN_NAME']
     communes_names = sorted(communes_names)
 
@@ -61,12 +64,13 @@ def index(request):
     }
 
     geojson_dir = geojson_dir = os.path.join(os.getcwd(),'geojson')
-
-    typo_group = add_base_layers(m,highlight_function, geojson_dir)
+    typo_group = add_base_layers(m,highlight_function, geojson_dir, gdf_municipalities)
     add_base_places(m,geojson_dir)
+    
     #add_categorical_legend(m)
 
     # Polutate 
+    
     indicators = pd.read_csv('./legend/ha_indicators_legend.csv', encoding='utf-8')
     list_env_descr = []
     list_demo_descr = []
@@ -107,9 +111,7 @@ def index(request):
         name_var = match.group(2)
 
         #gdf_municipalities = gpd.read_file('./geojson/typology_municipalities_4326.geojson')
-        #commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'] == commune_request_name]['MUN_OFS_ID'].iloc[0]
-        commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'].str.contains(commune_request_name)]['MUN_OFS_ID'].iloc[0]
-        commune_name_descr = gdf_municipalities[gdf_municipalities['MUN_NAME'].str.contains(commune_request_name)]['MUN_NAME'].iloc[0]
+        commune_numero = gdf_municipalities[gdf_municipalities['MUN_NAME'] == commune_request_name]['MUN_OFS_ID'].iloc[0]
 
         if any(name_var in x for x in list_env_descr):
             var_name = list_env[index_var]
@@ -127,7 +129,10 @@ def index(request):
             var_name = list_socio_eco[index_var]
             var_name_descr = list_socio_eco_descr[index_var]
 
-        gdf = gpd.read_file("./geojson/ha_indicators_4326.geojson")
+        t_init_2 = time.time()
+
+        #gdf = read_dataframe("./geojson/ha_indicators_4326.geojson")
+        gdf = gpd.read_file("./GPKG/ha_indicators_4326.gpkg", layer=var_name)
 
         map_dict = gdf.set_index('RELI')[var_name].to_dict()
         gdf_kept = gdf[gdf['MUN_OFS_ID']==commune_numero]
@@ -159,9 +164,10 @@ def index(request):
         data_tuples = list(zip(x_vect,width_vect,color_vect))
         df_test = pd.DataFrame(data_tuples, columns=['x','width','color'])
 
-        [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, unit, commune_name_descr, href, var_name_descr)
+        [legend_color_scale, legend_text, hist, chart, legend_moyenne_text] = add_informations(df_test, x_list, mean_commune, gdf_kept,var_name,map_dict, x_text, unit, commune_request_name, href, var_name_descr)
 
-        folium.GeoJson(gdf_kept, 
+        gdf_kept_1 = gdf_kept[['MUN_NAME', var_name, 'PTOT','geometry']]
+        folium.GeoJson(gdf_kept_1, 
             name='geojson',
             zoom_on_click=False,
             #tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', var_name, 'PTOT'],aliases=['Nom de la commune', 'Valeur',"Population totale de l'hectare"]),
@@ -175,17 +181,13 @@ def index(request):
 
         m.fit_bounds(hec_group.get_bounds())
 
-        gdf_communes = gpd.read_file('./shapefiles/Caracterisation_PCA.shp')
+        gdf_communes = gpd.read_file('./shapefiles/Caracterisation_PCA_simplified.shp')
 
-        #commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN']==commune_request_name].geometry.buffer(1000)
-        commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN'].str.contains(commune_request_name)].geometry.buffer(1000)
-        #commune_a_intersecter_geom = gdf_municipalities[gdf_municipalities['MUN_NAME']==commune_request_name].geometry.buffer(1000).to_crs('2056')
-        
+        commune_a_intersecter_geom = gdf_communes[gdf_communes['Nom_CMN']==commune_request_name].geometry.buffer(1000)
+
         gdf_communes_geom = gdf_communes.geometry
-        #gdf_municipalities_geom = gdf_municipalities.geometry.to_crs('2056')
 
         result_touches = gdf_communes_geom.intersects(commune_a_intersecter_geom.iloc[0])
-        #result_touches = gdf_municipalities_geom.intersects(commune_a_intersecter_geom.iloc[0])
         
         communes_kept_indexes = []
         for index, elem in enumerate(result_touches):
@@ -194,7 +196,7 @@ def index(request):
                 #name_of_commune = gdf_municipalities.iloc[index].MUN_NAME
                 communes_kept_indexes.append(index)
                 if name_of_commune != commune_request_name:
-                    folium.GeoJson(gdf[gdf['MUN_NAME']==name_of_commune], 
+                    folium.GeoJson(gdf[gdf['MUN_NAME']==name_of_commune][['MUN_NAME', var_name, 'PTOT','geometry']], 
                         name='geojson',
                         zoom_on_click=False,
                         tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', var_name, 'PTOT'], aliases=['Nom de la commune', 'Valeur '+unit, "Population totale de l'hectare"]),
@@ -208,8 +210,7 @@ def index(request):
         hec_group.add_to(m)
         m.keep_in_front(hec_group)
         
-        #current_commune_text = commune_request_name+" - "+var_name_descr + " " + unit
-        current_commune_text = commune_name_descr+" - "+var_name_descr + " " + unit
+        current_commune_text = commune_request_name+" - "+var_name_descr + " " + unit
 
     
     control.add_child(folium.IFrame(html='<a href="https://www.example.com">Visiter le site web</a>', width=200, height=100))
@@ -228,7 +229,7 @@ def index(request):
         'legend_color_scale':legend_color_scale,
         'legend_text':legend_text,
         'legend_moyenne_text':legend_moyenne_text,
-        'current_commune_name':commune_name_descr,
+        'current_commune_name':commune_request_name,
         'limitations_informations':limitations_informations,
         'current_commune_text' : current_commune_text,
         'var_name':var_name,
@@ -245,6 +246,7 @@ def typologie(request):
         min_lat=46.2,max_lat=47.3,min_lon=5.9,max_lon=7.2, 
         zoom_start=9, max_zoom=15, min_zoom=9,
         zoom_control=False,
+        prefer_canvas=True
         )
     folium.TileLayer('cartodbpositron', control=False).add_to(m)
 
@@ -269,7 +271,7 @@ def typologie(request):
         caption='Color Map'
     )
 
-    gdf_municipalities = gpd.read_file(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'))
+    gdf_municipalities = gpd.read_file(os.path.join(geojson_dir,'typology_municipalities_4326_simplified.geojson'))
 
     typo_group = folium.FeatureGroup(name='Typologie')
     folium.GeoJson(gdf_municipalities, 
@@ -295,6 +297,8 @@ def typologie(request):
     
     typo_list = zip(class_id,colors,typo_title, stats, description)
 
+    is_all_communes=True
+
     if request.method=="POST":
 
         m = folium.Map(location = [46.61280022381356, 6.61517533257687],
@@ -303,34 +307,59 @@ def typologie(request):
             zoom_start=10, max_zoom=15, 
             min_zoom=9,
             zoom_control=False,
+            prefer_canvas=True
             )
         folium.TileLayer('cartodbpositron', control=False).add_to(m)
 
         category_numero = int(request.POST['category'])
-        gdf = gpd.read_file(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'))
-        gdf_sorted = gdf[gdf['GROUP_ID'] == category_numero]
-        folium.GeoJson(gdf_sorted, 
-            name='geojson',
-            zoom_on_click=True,
-            overlay=False,
-            tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID'], aliases=['Nom de la commune','Classe de typologie']),
-            style_function= lambda feature:{
-            'fillColor': colormap(category_numero),
-            'fillOpacity': 0.6,
-            'weight':1,
-            'color':'white'
-            },
-            highlight_function=highlight_function).add_to(m)
+        gdf = gdf_municipalities #gpd.read_file(os.path.join(geojson_dir,'typology_municipalities_4326.geojson'))
+        if category_numero < 10:
+            gdf_sorted = gdf[gdf['GROUP_ID'] == category_numero]
+            folium.GeoJson(gdf_sorted, 
+                name='geojson',
+                zoom_on_click=True,
+                overlay=False,
+                tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID'], aliases=['Nom de la commune','Classe de typologie']),
+                style_function= lambda feature:{
+                'fillColor': colormap(category_numero),
+                'fillOpacity': 0.6,
+                'weight':1,
+                'color':'white'
+                },
+                highlight_function=highlight_function).add_to(m)
+            is_all_communes=False
+        else:
+            #gdf_sorted = gdf
+            folium.GeoJson(gdf_municipalities, 
+                name='geojson',
+                zoom_on_click=True,
+                overlay=False,
+                tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'GROUP_ID','shortname', 'PTOT'], aliases=['Nom de la commune','Classe de typologie','Typologie description','Population totale']),
+                style_function= lambda feature:{
+                'fillColor': colormap(feature['properties']['GROUP_ID']),
+                'fillOpacity': 0.6,
+                'weight':1,
+                'color':'white'
+                },
+                highlight_function=highlight_function).add_to(m)
+            is_all_communes=True
+       
 
+            
     m = m._repr_html_()
     context={
         'm':m,
-        'typo_list':typo_list
+        'typo_list':typo_list,
+        'is_all_communes':is_all_communes
     }
+
+
+    map_html = request.session.get('m')
 
     return render(request, 'typologie.html', context)
 
-def add_base_layers(m, highlight_function, geojson_dir):
+
+def add_base_layers(m, highlight_function, geojson_dir, gdf_municipalities):
 
     typology_legend = pd.read_csv('./legend/typology_legend.csv', encoding='utf-8')
     colors = typology_legend["hex_color"]
@@ -342,11 +371,9 @@ def add_base_layers(m, highlight_function, geojson_dir):
         caption='Color Map'
     )
 
-    gdf_municipalities = gpd.read_file('./geojson/typology_municipalities_4326.geojson')
-
     ################ COMMUNES ##############################################################
     communes_group = folium.FeatureGroup(name='Communes',control=False)
-    folium.GeoJson(gdf_municipalities, 
+    folium.GeoJson(gdf_municipalities[['MUN_NAME', 'PTOT','shortname','geometry']], 
         name='geojson',
         zoom_on_click=True,
         tooltip=folium.GeoJsonTooltip(fields=['MUN_NAME', 'PTOT','shortname'], aliases=['Nom de la commune', 'Population totale','Description de la typologie']),
@@ -355,12 +382,15 @@ def add_base_layers(m, highlight_function, geojson_dir):
         'weight':1,
         'color':'black'
         },
-        highlight_function=highlight_function).add_to(communes_group)
+        highlight_function=highlight_function,
+        smooth_factor=0.1).add_to(communes_group)
     communes_group.add_to(m)
 
+    
     ################ Typologie ##############################################################
+
     typo_group = folium.FeatureGroup(name='Typologie')
-    folium.GeoJson(gdf_municipalities, 
+    folium.GeoJson(gdf_municipalities[['MUN_NAME', 'GROUP_ID', 'shortname', 'PTOT','geometry']], 
         name='geojson',
         zoom_on_click=True,
         overlay=False,
@@ -375,6 +405,7 @@ def add_base_layers(m, highlight_function, geojson_dir):
     typo_group.add_to(m)
     m.keep_in_front(typo_group)
 
+
     return typo_group
 
 
@@ -388,7 +419,7 @@ def add_base_places(m, geojson_dir):
     etablissements_names = ['Pharmacies']
     etablissement_colors = ['green']
     etablissements_geojson = ['pharmacies_4326']
-
+    
     for index_etablissement, etablissement in enumerate(etablissements_names):
         gdf = gpd.read_file(os.path.join(geojson_dir,etablissements_geojson[index_etablissement]+'.geojson'))
         g = folium.plugins.FeatureGroupSubGroup(fg, etablissement, overlay=False)
@@ -414,6 +445,7 @@ def add_base_places(m, geojson_dir):
                 )
             )
         cluster.add_to(g)
+
 
 def set_layout(fig, min_canto, max_canto, height, var_name, unit):
 
@@ -483,12 +515,8 @@ def add_informations(df_test, x_list, mean_commune, gdf_kept, var_name, map_dict
 
     ############ Legend ##############################################
     invert_color_list = ["GREEN_SP","BLUE_SP","MEDREV"]
-    jaune_rouge_list = ["RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M","R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
     if var_name in invert_color_list:
         df_test["color"] = np.flip(df_test["color"].values)
-
-    if var_name in jaune_rouge_list:
-        df_test.loc[:, "color"] = ["#FFFFE0","#FFFF00","#FFCC00","#FF9933","#FF0000"]
 
     fig = go.Figure(data=[go.Bar(
                     x=df_test['x'],
@@ -610,7 +638,6 @@ def get_color_discrete_access(feature, var_name, min, range):
 def get_color_discrete(feature, var_name ,x1, x2, x3, x4 ):
     value = feature['properties'][var_name]
     invert_color_list = ["GREEN_SP","BLUE_SP","MEDREV"]
-    jaune_rouge_list = ["RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M","R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
     if value is None:
         return '#8c8c8c'
     if var_name in invert_color_list:
@@ -624,17 +651,6 @@ def get_color_discrete(feature, var_name ,x1, x2, x3, x4 ):
             return '#cdff32'
         else:
             return '#32ff6a'
-    elif var_name in jaune_rouge_list:
-        if value <= x1:
-            return '#FFFFE0' 
-        elif value <= x2:
-            return '#FFFF00'
-        elif value <= x3:
-            return '#FFCC00'
-        elif value <= x4:
-            return '#FF9933'
-        else:
-            return '#FF0000'
     else:
         if value <= x1:
             return '#32ff6a'
