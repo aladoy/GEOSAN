@@ -23,10 +23,18 @@ import re
 import time
 from shapely.geometry import shape
 from pyproj import CRS
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 
-# Create your views here.
+
+def logout_view(request):
+    logout(request)
+    return render(request, "logout.html")
+    # return redirect('logout')
 
 
+@login_required
 def index(request):
 
     t_init = time.time()
@@ -128,8 +136,7 @@ def index(request):
         "D_SCHOOL_S",
         "D_EDUC",
         "D_SECURITY",
-        "N_ACC_PED",
-        "N_ACC_BIC",
+        "NB_ACDNT",
         "D_GROCERY",
         "PLAYGRD_TIME",
         "D_FOREST",
@@ -197,15 +204,15 @@ def index(request):
 
         t_init = time.time()
         """gdf = gpd.read_file("./geojson/ha_indicators_4326.geojson")
-        list_var = ["NO2","PM10","PM25","NOISE","LST","ENV_INDEX", "RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M", "ER_TIME","DENTAL_TIME","PHARMA_TIME","AMBU_TIME","D_MEDIC","D_SCHOOL_O","D_SCHOOL_S","D_EDUC","D_SECURITY","N_ACC_PED","N_ACC_BIC","D_GROCERY","PLAYGRD_TIME","D_FOREST","D_LAKE","D_SPORT","D_SWIM","D_STOP_TOT","GREEN_SP","BLUE_SP","HEALTHCARE_INDEX", "R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
+        list_var = ["NO2","PM10","PM25","NOISE","LST","ENV_INDEX", "RP0014","RP1524","RP2564","RP65M","RP80M","RP0014_F","RP1524_F","RP2564_F","RP65M_F","RP80M_F","RP0014_M","RP1524_M","RP2564_M","RP65M_M","RP80M_M", "ER_TIME","DENTAL_TIME","PHARMA_TIME","AMBU_TIME","D_MEDIC","D_SCHOOL_O","D_SCHOOL_S","D_EDUC","D_SECURITY","NB_ACDNT","D_GROCERY","PLAYGRD_TIME","D_FOREST","D_LAKE","D_SPORT","D_SWIM","D_STOP_TOT","GREEN_SP","BLUE_SP","HEALTHCARE_INDEX", "R_PLA","AVG_PPH","MEDREV","R_DIV_WID","R_FFB","R_NN_FRA","R_NN_POBL","R_DIS","R_UNEMP","SOC_ECO_INDEX"]
         
         for var in list_var:
             gdf_var = gdf[['RELI','MUN_OFS_ID','MUN_NAME',var,'PTOT','geometry']]
             gdf_var.to_file("./GPKG/ha_indicators_4326.gpkg" , layer=var, driver='GPKG')
             print("Var :"+var)"""
 
-        # gdf = gpd.read_file("./GPKG/ha_indicators_4326_"+var_name+".gpkg")
-        gdf = gpd.read_file("./GPKG/ha_indicators_4326.gpkg", layer=var_name)
+        # gdf = gpd.read_file("./GPKG/ha_indicators_attr_layers_4326"+var_name+".gpkg")
+        gdf = gpd.read_file("./GPKG/ha_indicators_attr_layers_4326.gpkg", layer=var_name)
         print(gdf)
 
         # recuperer le nom de la commune qui commence par les memes caracteres :
@@ -222,7 +229,7 @@ def index(request):
 
         print("----------------------------")
         print(str(time.time() - t_init))
-        # gdf = gpd.read_file("./GPKG/ha_indicators_4326.gpkg", layer=var_name)
+        # gdf = gpd.read_file("./GPKG/ha_indicators_attr_layers_4326.gpkg", layer=var_name)
 
         map_dict = gdf.set_index("RELI")[var_name].to_dict()
         gdf_kept = gdf[gdf["MUN_OFS_ID"] == commune_numero]
@@ -417,7 +424,7 @@ def index(request):
 
     return render(request, "index.html", context)
 
-
+@login_required
 def typologie(request):
 
     m = folium.Map(
@@ -442,7 +449,7 @@ def typologie(request):
         "dashArray": "3, 6",  # transforms the solid stroke to a dashed stroke
     }
 
-    geojson_dir = geojson_dir = os.path.join(os.getcwd(), "geojson")
+    geojson_dir = geojson_dir = os.path.join(os.getcwd(), "data")
 
     typology_legend = pd.read_csv("./legend/typology_legend.csv", encoding="utf-8")
 
