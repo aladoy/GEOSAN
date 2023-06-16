@@ -179,6 +179,8 @@ def index(request):
         typo_group.show = False
 
         selected_list = request.POST.get("var_name")
+        print("selected list:")
+        print(selected_list)
 
         match = re.match(r"(\d+)(\D+)", selected_list)
         index_var = int(match.group(1))
@@ -212,7 +214,9 @@ def index(request):
             print("Var :"+var)"""
 
         # gdf = gpd.read_file("./GPKG/ha_indicators_attr_layers_4326"+var_name+".gpkg")
-        gdf = gpd.read_file("./GPKG/ha_indicators_attr_layers_4326.gpkg", layer=var_name)
+        gdf = gpd.read_file(
+            "./GPKG/ha_indicators_attr_layers_4326.gpkg", layer=var_name
+        )
         print(gdf)
 
         # recuperer le nom de la commune qui commence par les memes caracteres :
@@ -241,6 +245,9 @@ def index(request):
         gdf_to_dissolve = gdf_to_dissolve.dissolve(by="MUN_OFS_ID").centroid
 
         m.location = [gdf_to_dissolve[0].y, gdf_to_dissolve[0].x]
+
+        print("variable")
+        print(var_name)
 
         hec_group = folium.FeatureGroup(name=var_name)
 
@@ -424,6 +431,7 @@ def index(request):
 
     return render(request, "index.html", context)
 
+
 @login_required
 def typologie(request):
 
@@ -449,7 +457,7 @@ def typologie(request):
         "dashArray": "3, 6",  # transforms the solid stroke to a dashed stroke
     }
 
-    geojson_dir = geojson_dir = os.path.join(os.getcwd(), "data")
+    geojson_dir = geojson_dir = os.path.join(os.getcwd(), "geojson")
 
     typology_legend = pd.read_csv("./legend/typology_legend.csv", encoding="utf-8")
 
@@ -464,7 +472,7 @@ def typologie(request):
     )
 
     gdf_municipalities = gpd.read_file(
-        os.path.join(geojson_dir, "typology_municipalities_4326_simplified.geojson")
+        os.path.join(geojson_dir, "typology_municipalities_4326.geojson")
     )
 
     typo_group = folium.FeatureGroup(name="Typologie")
@@ -654,37 +662,55 @@ def add_base_places(m, geojson_dir):
     )
     m.add_child(g)
 
-    etablissements_names = ["Pharmacies"]
-    etablissement_colors = ["green"]
-    etablissements_geojson = ["pharmacies_4326"]
+    etablissements_dict = {
+        "EMS": "blue",
+        "EPSM": "blue",
+        "ESPACE PREVENTION": "red",
+        "PHARMACIE": "green",
+        "URGENCE": "red",
+    }
 
-    for index_etablissement, etablissement in enumerate(etablissements_names):
-        gdf = gpd.read_file(
-            os.path.join(
-                geojson_dir, etablissements_geojson[index_etablissement] + ".geojson"
-            )
-        )
-        g = folium.plugins.FeatureGroupSubGroup(fg, etablissement, overlay=False)
+    gdf = gpd.read_file(
+        os.path.join(geojson_dir, "vd_medicosocial_institutions_4326" + ".geojson")
+    )
+
+    for etablissement_name, etablissement_color in etablissements_dict.items():
+        g = folium.plugins.FeatureGroupSubGroup(fg, etablissement_name, overlay=False)
         m.add_child(g)
-        cluster = MarkerCluster(name=etablissement)
-        geo_df = [[point.xy[1][0], point.xy[0][0]] for point in gdf.geometry]
-
+        cluster = MarkerCluster(name=etablissement_name)
+        gdf_cut = gdf[gdf["type"] == etablissement_name].reset_index(drop=True)
+        # print(gdf_cut)
+        geo_df = [[point.xy[1][0], point.xy[0][0]] for point in gdf_cut.geometry]
         for index, coordinates in enumerate(geo_df):
 
-            if etablissement == "Pharmacies":
-                iframe = folium.IFrame(
-                    "<strong>Nom: </strong>" + str(gdf.nom[index]) + "<br>"
-                )
-                # + '<strong>Exploitant: </strong>' + str(gdf.EXPLOITANT[index]))
-
-            if etablissement == "Centre medico-social":
-                iframe = folium.IFrame(
-                    "<strong>Nom: </strong>"
-                    + str(gdf.nom[index])
-                    + "<br>"
-                    + "<strong>Exploitant: </strong>"
-                    + str(gdf.EXPLOITANT[index])
-                )
+            jul = str(gdf_cut.nom[index])
+            iframe = folium.IFrame(
+                "<strong>Nom: </strong>"
+                + "<br>"
+                + str(gdf_cut.nom[index])
+                + "<br>"
+                + "<strong>Exploitant: </strong>"
+                + "<br>"
+                + str(gdf_cut.exploitant[index])
+                + "<br>"
+                + "<strong>Adresse: </strong>"
+                + "<br>"
+                + str(gdf_cut.rue[index])
+                + " "
+                + str(gdf_cut.numero[index])
+                + " "
+                + str(gdf_cut.npa[index])
+                + " "
+                + str(gdf_cut.localite[index])
+                + "<br>"
+                + "<strong>website: </strong>"
+                + "<br>"
+                + "<a href='"
+                + str(gdf_cut.url[index])
+                + "' target=_blank>"
+                + str(gdf_cut.nom[index])
+                + "</a>"
+            )
 
             cluster.add_child(
                 folium.Marker(
@@ -692,7 +718,7 @@ def add_base_places(m, geojson_dir):
                     popup=folium.Popup(iframe, min_width=300, max_width=300),
                     icon=folium.Icon(
                         icon="glyphicon-plus",
-                        color=etablissement_colors[index_etablissement],
+                        color=etablissement_color,
                     ),
                 )
             )
