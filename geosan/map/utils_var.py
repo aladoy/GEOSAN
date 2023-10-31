@@ -47,7 +47,7 @@ def select_var_limites(var_name, gdf, gdf_kept):
 
     limitations_informations = ""
     
-    limitations_informations = "* " + limitations_informations
+    limitations_informations = limitations_informations
 
     return x_list, x_text, limitations_informations, unit, href
 

@@ -176,6 +176,7 @@ def index(request):
 
     if request.method == "POST":
 
+
         typo_group.show = False
 
         selected_list = request.POST.get("var_name")
@@ -230,6 +231,8 @@ def index(request):
         commune_numero = gdf_municipalities[
             gdf_municipalities["MUN_NAME"] == commune_request_name
         ]["MUN_OFS_ID"].iloc[0]
+
+        add_commune_outline(m, gdf_municipalities ,commune_request_name)
 
         print("----------------------------")
         print(str(time.time() - t_init))
@@ -620,6 +623,11 @@ def add_base_layers(m, highlight_function, geojson_dir, gdf_municipalities):
     gdf_municipalities = gpd.read_file(
         "./geojson/typology_municipalities_4326_simplified.geojson"
     )
+
+    gdf_municipalities = gpd.read_file(
+        "./geojson/typology_municipalities_4326_simplified.geojson"
+    )
+
     ################ Typologie ##############################################################
 
     typo_group = folium.FeatureGroup(name="Typologie")
@@ -723,6 +731,24 @@ def add_base_places(m, geojson_dir):
                 )
             )
         cluster.add_to(g)
+
+
+def add_commune_outline(m, gdf_municipalities ,commune_request_name):
+
+    gdf = gdf_municipalities[gdf_municipalities['MUN_NAME'] == commune_request_name]
+    commune_group = folium.FeatureGroup(name="", control=False)
+    folium.GeoJson(
+        gdf[["MUN_NAME", "PTOT", "geometry"]],
+        name="geojson",
+        zoom_on_click=False,
+        style_function=lambda feature: {
+            "fillOpacity": 0,
+            "weight": 5,
+            "color": "red",
+        },
+        smooth_factor=0.1,
+    ).add_to(commune_group)
+    commune_group.add_to(m)
 
 
 def set_layout(fig, min_canto, max_canto, height, var_name, unit):
