@@ -741,6 +741,10 @@ def add_commune_outline(m, gdf_municipalities ,commune_request_name):
         gdf[["MUN_NAME", "PTOT", "geometry"]],
         name="geojson",
         zoom_on_click=False,
+        tooltip=folium.GeoJsonTooltip(
+            fields=["MUN_NAME", "PTOT"],
+            aliases=["Nom de la commune", "Population totale"],
+        ),
         style_function=lambda feature: {
             "fillOpacity": 0,
             "weight": 5,
